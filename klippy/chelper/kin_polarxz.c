@@ -24,9 +24,9 @@ polarxz_stepper_angle_post_fixup(struct stepper_kinematics *sk)
 {
     // Normalize the stepper_bed angle
     if (sk->commanded_pos < -M_PI)
-        sk->commanded_pos += 2 * M_PI;
+        sk->commanded_pos += 2.0f * M_PI;
     else if (sk->commanded_pos > M_PI)
-        sk->commanded_pos -= 2 * M_PI;
+        sk->commanded_pos -= 2.0f * M_PI;
 }
 
 static double
