@@ -13,6 +13,8 @@ class PolarXZKinematics:
                 units_in_radians=True)
         rail_x = stepper.PrinterRail(config.getsection('stepper_x'))
         rail_z = stepper.PrinterRail(config.getsection('stepper_z'))
+        self.rail_x = rail_x
+        self.rail_z = rail_z
         stepper_bed.setup_itersolve('polarxz_stepper_alloc', b'a')
         rail_x.setup_itersolve('polarxz_stepper_alloc', b'+')
         rail_z.setup_itersolve('polarxz_stepper_alloc', b'-')
@@ -84,30 +86,8 @@ class PolarXZKinematics:
         # Do actual homing
         if home_xy:
             self._home_axis(homing_state, 0, self.rails[0])
-            self._home_axis(homing_state, 1, self.rails[0])
         if home_z:
             self._home_axis(homing_state, 2, self.rails[1])
-    def home2(self, homing_state):
-        # Each axis is homed independently and in order
-        homing_axes = homing_state.get_axes()
-        home_xy = 0 in homing_axes or 1 in homing_axes
-        home_z = 2 in homing_axes
-        for axis in homing_state.get_axes():
-            if axis == 1:
-                next
-            rail = self.rails[axis]
-            # Determine movement
-            position_min, position_max = rail.get_range()
-            hi = rail.get_homing_info()
-            homepos = [None, None, None, None]
-            homepos[axis] = hi.position_endstop
-            forcepos = list(homepos)
-            if hi.positive_dir:
-                forcepos[axis] -= 1.5 * (hi.position_endstop - position_min)
-            else:
-                forcepos[axis] += 1.5 * (position_max - hi.position_endstop)
-            # Perform homing
-            homing_state.home_rails([rail], forcepos, homepos)
     def _motor_off(self, print_time):
         self.limit_z = (1.0, -1.0)
         self.limit_xy2 = -1.
